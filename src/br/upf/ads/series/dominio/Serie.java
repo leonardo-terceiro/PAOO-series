@@ -12,9 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -41,16 +39,13 @@ public class Serie implements Serializable {
     @OneToMany(mappedBy = "serie")
     private List<Temporada> temporadas;     
     
-    @ManyToMany // TORNAR 1:N
-    @JoinTable(name = "serie_genero", 
-            joinColumns = @JoinColumn(name = "serie_id"), 
-            inverseJoinColumns = @JoinColumn(name = "genero_id"))
-    private List<Genero> generos;
+    @ManyToOne
+    private Genero generos;
 
     public Serie() {
     }
     
-    public Serie(Long id, String nome, Integer anoLancamento, List<Genero> generos) {
+    public Serie(Long id, String nome, Integer anoLancamento, Genero generos) {
         this.id = id;
         this.nome = nome;
         this.anoLancamento = anoLancamento;
@@ -90,11 +85,11 @@ public class Serie implements Serializable {
         this.anoLancamento = anoLancamento;
     }
 
-    public List<Genero> getGeneros() {
+    public Genero getGeneros() {
         return generos;
     }
 
-    public void setGeneros(List<Genero> generos) {
+    public void setGeneros(Genero generos) {
         this.generos = generos;
     }
 

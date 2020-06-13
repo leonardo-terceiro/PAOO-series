@@ -33,9 +33,6 @@ public class Genero implements Serializable {
     @Column(name = "nome")
     private String nome;
 
-    @ManyToMany(mappedBy="generos")
-    private List<Serie> series;
-
     public Genero() {
     }
 
@@ -58,14 +55,6 @@ public class Genero implements Serializable {
 
     public void setNome(String nome) {
         this.nome = nome;
-    }
-
-    public List<Serie> getSeries() {
-        return series;
-    }
-
-    public void setSeries(List<Serie> series) {
-        this.series = series;
     }
     
     @Override

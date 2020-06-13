@@ -39,11 +39,10 @@ public class Produtora implements Serializable {
     public Produtora() {
     }
 
-    public Produtora(Long id, String nome, String nacionalidade, List<Temporada> temporadas) {
+    public Produtora(Long id, String nome, String nacionalidade) {
         this.id = id;
         this.nome = nome;
         this.nacionalidade = nacionalidade;
-        this.temporadas = temporadas;
     }
     
     public Long getId() {

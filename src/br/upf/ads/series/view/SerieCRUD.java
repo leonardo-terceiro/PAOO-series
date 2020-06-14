@@ -5,7 +5,8 @@
  */
 package br.upf.ads.series.view;
 
-import br.upf.ads.series.dominio.Produtora;
+import br.upf.ads.series.dominio.Genero;
+import br.upf.ads.series.dominio.Serie;
 import br.upf.ads.series.persistencia.JPAUtil;
 import javax.persistence.EntityManager;
 import javax.swing.JOptionPane;
@@ -14,31 +15,17 @@ import javax.swing.JOptionPane;
  *
  * @author leonardo.bertuzzi
  */
-public class ProdutoraCRUD1 extends javax.swing.JDialog {
+public class SerieCRUD extends javax.swing.JDialog {
 
-    private Boolean editando;
-    private Produtora selecionado;
-    private void atualizaLista(){
-        list1.clear();
-        list1.addAll(query1.getResultList());
-    }
-    private void atualizaTela(){
-        uiIncluir.setEnabled(!editando);
-        uiAlterar.setEnabled(!editando && uiTabela.getSelectedRow() >= 0);
-        uiExcluir.setEnabled(!editando && uiTabela.getSelectedRow() >= 0);
-        uiSalvar.setEnabled(editando);
-        uiCancelar.setEnabled(editando);
-        uiPaineis.setSelectedComponent(editando ? uiEdicao : uiConsulta);
-    }
-    
     /**
-     * Creates new form ProdutoraCRUD1
+     * Creates new form SerieCRUD1
      */
-    public ProdutoraCRUD1(java.awt.Frame parent, boolean modal) {
+    public SerieCRUD(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         editando = false;
         atualizaTela();
+
     }
 
     /**
@@ -51,12 +38,14 @@ public class ProdutoraCRUD1 extends javax.swing.JDialog {
     private void initComponents() {
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
-        entityManager1 = JPAUtil.getEntityManager()
-        ;
-        query1 = java.beans.Beans.isDesignTime() ? null : entityManager1.createQuery("SELECT p FROM Produtora p");
+        javax.persistence.EntityManager entityManager1 = JPAUtil.getEntityManager();
+        query1 = java.beans.Beans.isDesignTime() ? null : entityManager1.createQuery("SELECT s FROM Serie s");
         list1 = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : org.jdesktop.observablecollections.ObservableCollections.observableList(query1.getResultList());
+        query2 = java.beans.Beans.isDesignTime() ? null : entityManager1.createQuery("SELECT g FROM Genero g ORDER BY g.nome");
+        list2 = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : org.jdesktop.observablecollections.ObservableCollections.observableList(query2.getResultList());
         uiPaineis = new javax.swing.JTabbedPane();
         uiConsulta = new javax.swing.JPanel();
+        jPanel3 = new javax.swing.JPanel();
         uiIncluir = new javax.swing.JButton();
         uiAlterar = new javax.swing.JButton();
         uiExcluir = new javax.swing.JButton();
@@ -67,14 +56,18 @@ public class ProdutoraCRUD1 extends javax.swing.JDialog {
         uiSalvar = new javax.swing.JButton();
         uiCancelar = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
-        uiNomeProdutora = new javax.swing.JTextField();
+        uiNomeSerie = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
-        uiNacionalidade = new javax.swing.JTextField();
+        uiAnoLancamento = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        uiGenero = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
+        jPanel3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
         uiIncluir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/upf/ads/series/icones/cad_incluir.png"))); // NOI18N
-        uiIncluir.setText("Inlcuir");
+        uiIncluir.setText("Incluir");
         uiIncluir.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 uiIncluirActionPerformed(evt);
@@ -97,6 +90,30 @@ public class ProdutoraCRUD1 extends javax.swing.JDialog {
             }
         });
 
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(uiIncluir)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(uiAlterar)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(uiExcluir)
+                .addContainerGap(124, Short.MAX_VALUE))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(uiIncluir)
+                    .addComponent(uiAlterar)
+                    .addComponent(uiExcluir))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
         org.jdesktop.swingbinding.JTableBinding jTableBinding = org.jdesktop.swingbinding.SwingBindings.createJTableBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, list1, uiTabela);
         org.jdesktop.swingbinding.JTableBinding.ColumnBinding columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${id}"));
         columnBinding.setColumnName("Id");
@@ -104,11 +121,15 @@ public class ProdutoraCRUD1 extends javax.swing.JDialog {
         columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${nome}"));
         columnBinding.setColumnName("Nome");
         columnBinding.setColumnClass(String.class);
-        columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${nacionalidade}"));
-        columnBinding.setColumnName("Nacionalidade");
-        columnBinding.setColumnClass(String.class);
+        columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${anoLancamento}"));
+        columnBinding.setColumnName("Ano Lancamento");
+        columnBinding.setColumnClass(Integer.class);
+        columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${generos}"));
+        columnBinding.setColumnName("Generos");
+        columnBinding.setColumnClass(br.upf.ads.series.dominio.Genero.class);
         bindingGroup.addBinding(jTableBinding);
         jTableBinding.bind();
+
         uiTabela.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 uiTabelaMouseClicked(evt);
@@ -120,27 +141,16 @@ public class ProdutoraCRUD1 extends javax.swing.JDialog {
         uiConsulta.setLayout(uiConsultaLayout);
         uiConsultaLayout.setHorizontalGroup(
             uiConsultaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(uiConsultaLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(uiIncluir)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(uiAlterar)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(uiExcluir)
-                .addContainerGap(126, Short.MAX_VALUE))
+            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
         uiConsultaLayout.setVerticalGroup(
             uiConsultaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(uiConsultaLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(uiConsultaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(uiIncluir)
-                    .addComponent(uiAlterar)
-                    .addComponent(uiExcluir))
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         uiPaineis.addTab("Consulta", uiConsulta);
@@ -172,7 +182,7 @@ public class ProdutoraCRUD1 extends javax.swing.JDialog {
                 .addComponent(uiSalvar)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(uiCancelar)
-                .addContainerGap(199, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -184,14 +194,21 @@ public class ProdutoraCRUD1 extends javax.swing.JDialog {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jLabel1.setText("Nome da produtora:");
+        jLabel1.setText("Nome da série:");
 
-        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, uiTabela, org.jdesktop.beansbinding.ELProperty.create("${selectedElement.nome}"), uiNomeProdutora, org.jdesktop.beansbinding.BeanProperty.create("text"));
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, uiTabela, org.jdesktop.beansbinding.ELProperty.create("${selectedElement.nome}"), uiNomeSerie, org.jdesktop.beansbinding.BeanProperty.create("text"));
         bindingGroup.addBinding(binding);
 
-        jLabel2.setText("Nacionalidade:");
+        jLabel2.setText("Ano de lançamento:");
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, uiTabela, org.jdesktop.beansbinding.ELProperty.create("${selectedElement.nacionalidade}"), uiNacionalidade, org.jdesktop.beansbinding.BeanProperty.create("text"));
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, uiTabela, org.jdesktop.beansbinding.ELProperty.create("${selectedElement.anoLancamento}"), uiAnoLancamento, org.jdesktop.beansbinding.BeanProperty.create("text"));
+        bindingGroup.addBinding(binding);
+
+        jLabel3.setText("Gênero:");
+
+        org.jdesktop.swingbinding.JComboBoxBinding jComboBoxBinding = org.jdesktop.swingbinding.SwingBindings.createJComboBoxBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, list2, uiGenero);
+        bindingGroup.addBinding(jComboBoxBinding);
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, uiTabela, org.jdesktop.beansbinding.ELProperty.create("${selectedElement.generos}"), uiGenero, org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
         bindingGroup.addBinding(binding);
 
         javax.swing.GroupLayout uiEdicaoLayout = new javax.swing.GroupLayout(uiEdicao);
@@ -202,13 +219,15 @@ public class ProdutoraCRUD1 extends javax.swing.JDialog {
             .addGroup(uiEdicaoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(uiEdicaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2)
                     .addComponent(jLabel1)
-                    .addComponent(jLabel2))
+                    .addComponent(jLabel3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(uiEdicaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(uiNomeProdutora, javax.swing.GroupLayout.DEFAULT_SIZE, 106, Short.MAX_VALUE)
-                    .addComponent(uiNacionalidade))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(uiAnoLancamento, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(uiGenero, 0, 242, Short.MAX_VALUE)
+                    .addComponent(uiNomeSerie))
+                .addContainerGap(43, Short.MAX_VALUE))
         );
         uiEdicaoLayout.setVerticalGroup(
             uiEdicaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -217,12 +236,16 @@ public class ProdutoraCRUD1 extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(uiEdicaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(uiNomeProdutora, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(uiNomeSerie, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(uiEdicaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(uiNacionalidade, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 127, Short.MAX_VALUE))
+                    .addComponent(uiAnoLancamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(uiEdicaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel3)
+                    .addComponent(uiGenero, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 114, Short.MAX_VALUE))
         );
 
         uiPaineis.addTab("Edição", uiEdicao);
@@ -235,7 +258,9 @@ public class ProdutoraCRUD1 extends javax.swing.JDialog {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(uiPaineis, javax.swing.GroupLayout.PREFERRED_SIZE, 261, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(uiPaineis, javax.swing.GroupLayout.PREFERRED_SIZE, 274, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 1, Short.MAX_VALUE))
         );
 
         bindingGroup.bind();
@@ -243,32 +268,35 @@ public class ProdutoraCRUD1 extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void uiExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uiExcluirActionPerformed
-        if (JOptionPane.showConfirmDialog(rootPane, "Confirma a exclusão?") == 0) {
-            selecionado = list1.get(uiTabela.getSelectedRow());
-            EntityManager em = JPAUtil.getEntityManager();
-            em.getTransaction().begin();
-            em.remove(em.merge(selecionado));
-            em.getTransaction().commit();
-            selecionado = null;
-            atualizaLista();
-            atualizaTela();
-        }
-    }//GEN-LAST:event_uiExcluirActionPerformed
-
     private void uiIncluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uiIncluirActionPerformed
         editando = true;
-        selecionado = new Produtora();
+        selecionado = new Serie();
         list1.add(selecionado);
         uiTabela.setRowSelectionInterval(list1.size() - 1, list1.size() - 1);
         atualizaTela();
+
     }//GEN-LAST:event_uiIncluirActionPerformed
 
     private void uiAlterarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uiAlterarActionPerformed
         editando = true;
         selecionado = list1.get(uiTabela.getSelectedRow());
         atualizaTela();
+
     }//GEN-LAST:event_uiAlterarActionPerformed
+
+    private void uiExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uiExcluirActionPerformed
+        if (JOptionPane.showConfirmDialog(rootPane, "Confirma a exclusão?") == 0) {
+        selecionado = list1.get(uiTabela.getSelectedRow());
+        EntityManager em = JPAUtil.getEntityManager();
+        em.getTransaction().begin();
+        em.remove(em.merge(selecionado));
+        em.getTransaction().commit();
+        selecionado = null;
+        atualizaLista();
+        atualizaTela();
+ }
+
+    }//GEN-LAST:event_uiExcluirActionPerformed
 
     private void uiSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uiSalvarActionPerformed
         editando = false;
@@ -310,20 +338,21 @@ public class ProdutoraCRUD1 extends javax.swing.JDialog {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ProdutoraCRUD1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SerieCRUD.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ProdutoraCRUD1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SerieCRUD.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ProdutoraCRUD1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SerieCRUD.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ProdutoraCRUD1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SerieCRUD.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                ProdutoraCRUD1 dialog = new ProdutoraCRUD1(new javax.swing.JFrame(), true);
+                SerieCRUD dialog = new SerieCRUD(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
@@ -336,24 +365,44 @@ public class ProdutoraCRUD1 extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.persistence.EntityManager entityManager1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
-    private java.util.List<Produtora> list1;
+    private java.util.List<Serie> list1;
+    private java.util.List<Genero> list2;
     private javax.persistence.Query query1;
+    private javax.persistence.Query query2;
     private javax.swing.JButton uiAlterar;
+    private javax.swing.JTextField uiAnoLancamento;
     private javax.swing.JButton uiCancelar;
     private javax.swing.JPanel uiConsulta;
     private javax.swing.JPanel uiEdicao;
     private javax.swing.JButton uiExcluir;
+    private javax.swing.JComboBox<String> uiGenero;
     private javax.swing.JButton uiIncluir;
-    private javax.swing.JTextField uiNacionalidade;
-    private javax.swing.JTextField uiNomeProdutora;
+    private javax.swing.JTextField uiNomeSerie;
     private javax.swing.JTabbedPane uiPaineis;
     private javax.swing.JButton uiSalvar;
     private javax.swing.JTable uiTabela;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
+
+// End of variables declaration
+ private Boolean editando;
+ private Serie selecionado;
+ private void atualizaLista(){
+    list1.clear();
+    list1.addAll(query1.getResultList());
+ }
+ private void atualizaTela(){
+    uiIncluir.setEnabled(!editando);
+    uiAlterar.setEnabled(!editando && uiTabela.getSelectedRow() >= 0);
+    uiExcluir.setEnabled(!editando && uiTabela.getSelectedRow() >= 0);
+    uiSalvar.setEnabled(editando);
+    uiCancelar.setEnabled(editando);
+    uiPaineis.setSelectedComponent(editando ? uiEdicao : uiConsulta);
+   }
 }

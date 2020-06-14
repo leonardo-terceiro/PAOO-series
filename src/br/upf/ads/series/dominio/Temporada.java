@@ -130,7 +130,7 @@ public class Temporada implements Serializable {
 
     @Override
     public String toString() {
-        return "br.upf.ads.series.dominio.Temporada[ id=" + id + " ]";
+        return String.valueOf(numero) + "º temporada " + serie.getNome();
     }
     
 }

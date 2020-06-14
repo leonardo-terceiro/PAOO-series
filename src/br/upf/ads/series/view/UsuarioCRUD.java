@@ -14,7 +14,7 @@ import javax.swing.JOptionPane;
  *
  * @author leonardo.bertuzzi
  */
-public class UsuarioCRUD1 extends javax.swing.JDialog {
+public class UsuarioCRUD extends javax.swing.JDialog {
 
     private Boolean editando;
     private Usuario selecionado;
@@ -35,7 +35,7 @@ public class UsuarioCRUD1 extends javax.swing.JDialog {
     /**
      * Creates new form UsuarioCRUD1
      */
-    public UsuarioCRUD1(java.awt.Frame parent, boolean modal) {
+    public UsuarioCRUD(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         editando = false;
@@ -339,20 +339,21 @@ public class UsuarioCRUD1 extends javax.swing.JDialog {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(UsuarioCRUD1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(UsuarioCRUD.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(UsuarioCRUD1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(UsuarioCRUD.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(UsuarioCRUD1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(UsuarioCRUD.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(UsuarioCRUD1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(UsuarioCRUD.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                UsuarioCRUD1 dialog = new UsuarioCRUD1(new javax.swing.JFrame(), true);
+                UsuarioCRUD dialog = new UsuarioCRUD(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {

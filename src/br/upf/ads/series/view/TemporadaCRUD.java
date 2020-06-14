@@ -5,17 +5,43 @@
  */
 package br.upf.ads.series.view;
 
+import br.upf.ads.series.dominio.Produtora;
+import br.upf.ads.series.dominio.Serie;
+import br.upf.ads.series.dominio.Temporada;
+import br.upf.ads.series.persistencia.JPAUtil;
+import javax.persistence.EntityManager;
+import javax.swing.JOptionPane;
+
 /**
  *
- * @author danrl
+ * @author leonardo.bertuzzi
  */
-public class TemporadaCRUD extends javax.swing.JFrame {
+public class TemporadaCRUD extends javax.swing.JDialog {
 
+    private Boolean editando;
+    private Temporada selecionado;
+   
+    private void atualizaLista(){
+        list1.clear();
+        list1.addAll(query1.getResultList());
+    }
+    private void atualizaTela(){
+        uiIncluir.setEnabled(!editando);
+        uiAlterar.setEnabled(!editando && uiTabela.getSelectedRow() >= 0);
+        uiExcluir.setEnabled(!editando && uiTabela.getSelectedRow() >= 0);
+        uiSalvar.setEnabled(editando);
+        uiCancelar.setEnabled(editando);
+        uiPaineis.setSelectedComponent(editando ? uiEdicao : uiConsulta);
+    }
+    
     /**
-     * Creates new form TemporadaCRUD
+     * Creates new form TemporadaCRUD1
      */
-    public TemporadaCRUD() {
+    public TemporadaCRUD(java.awt.Frame parent, boolean modal) {
+        super(parent, modal);
         initComponents();
+        editando = false;
+        atualizaTela();
     }
 
     /**
@@ -26,12 +52,16 @@ public class TemporadaCRUD extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jTable2 = new javax.swing.JTable();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
+        entityManager1 = JPAUtil.getEntityManager();
+        query1 = java.beans.Beans.isDesignTime() ? null : entityManager1.createQuery("SELECT t FROM Temporada t");
+        list1 = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : org.jdesktop.observablecollections.ObservableCollections.observableList(query1.getResultList());
+        queryProd = java.beans.Beans.isDesignTime() ? null : entityManager1.createQuery("SELECT p FROM Produtora p ORDER BY p.nome");
+        listProd = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : org.jdesktop.observablecollections.ObservableCollections.observableList(queryProd.getResultList());
+        querySerie = java.beans.Beans.isDesignTime() ? null : entityManager1.createQuery("SELECT s FROM Serie s ORDER BY s.nome");
+        listSerie = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : org.jdesktop.observablecollections.ObservableCollections.observableList(querySerie.getResultList());
+        uiPaineis = new javax.swing.JTabbedPane();
         uiConsulta = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         uiIncluir = new javax.swing.JButton();
@@ -52,44 +82,33 @@ public class TemporadaCRUD extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         uiSerie = new javax.swing.JComboBox<>();
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane1.setViewportView(jTable1);
-
-        jTable2.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane2.setViewportView(jTable2);
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jPanel3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         uiIncluir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/upf/ads/series/icones/cad_incluir.png"))); // NOI18N
         uiIncluir.setText("Incluir");
+        uiIncluir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                uiIncluirActionPerformed(evt);
+            }
+        });
 
         uiAlterar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/upf/ads/series/icones/cad_alterar.png"))); // NOI18N
         uiAlterar.setText("Alterar");
+        uiAlterar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                uiAlterarActionPerformed(evt);
+            }
+        });
 
         uiExcluir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/upf/ads/series/icones/cad_excluir.png"))); // NOI18N
         uiExcluir.setText("Excluir");
+        uiExcluir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                uiExcluirActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -102,7 +121,7 @@ public class TemporadaCRUD extends javax.swing.JFrame {
                 .addComponent(uiAlterar)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(uiExcluir)
-                .addContainerGap(124, Short.MAX_VALUE))
+                .addContainerGap(272, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -115,17 +134,30 @@ public class TemporadaCRUD extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        uiTabela.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+        org.jdesktop.swingbinding.JTableBinding jTableBinding = org.jdesktop.swingbinding.SwingBindings.createJTableBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, list1, uiTabela);
+        org.jdesktop.swingbinding.JTableBinding.ColumnBinding columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${id}"));
+        columnBinding.setColumnName("Id");
+        columnBinding.setColumnClass(Long.class);
+        columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${numero}"));
+        columnBinding.setColumnName("Numero");
+        columnBinding.setColumnClass(Integer.class);
+        columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${anoLancamento}"));
+        columnBinding.setColumnName("Ano Lancamento");
+        columnBinding.setColumnClass(Integer.class);
+        columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${serie}"));
+        columnBinding.setColumnName("Serie");
+        columnBinding.setColumnClass(br.upf.ads.series.dominio.Serie.class);
+        columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${produtora}"));
+        columnBinding.setColumnName("Produtora");
+        columnBinding.setColumnClass(br.upf.ads.series.dominio.Produtora.class);
+        bindingGroup.addBinding(jTableBinding);
+        jTableBinding.bind();
+
+        uiTabela.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                uiTabelaMouseClicked(evt);
             }
-        ));
+        });
         jScrollPane3.setViewportView(uiTabela);
 
         javax.swing.GroupLayout uiConsultaLayout = new javax.swing.GroupLayout(uiConsulta);
@@ -144,15 +176,25 @@ public class TemporadaCRUD extends javax.swing.JFrame {
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Consulta", uiConsulta);
+        uiPaineis.addTab("Consulta", uiConsulta);
 
         jPanel4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         uiSalvar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/upf/ads/series/icones/cad_gravar.png"))); // NOI18N
         uiSalvar.setText("Salvar");
+        uiSalvar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                uiSalvarActionPerformed(evt);
+            }
+        });
 
         uiCancelar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/upf/ads/series/icones/botao_voltar.png"))); // NOI18N
         uiCancelar.setText("Cancelar");
+        uiCancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                uiCancelarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -163,7 +205,7 @@ public class TemporadaCRUD extends javax.swing.JFrame {
                 .addComponent(uiSalvar)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(uiCancelar)
-                .addContainerGap(199, Short.MAX_VALUE))
+                .addContainerGap(347, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -177,15 +219,27 @@ public class TemporadaCRUD extends javax.swing.JFrame {
 
         jLabel1.setText("Número:");
 
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, uiTabela, org.jdesktop.beansbinding.ELProperty.create("${selectedElement.numero}"), uiNumero, org.jdesktop.beansbinding.BeanProperty.create("text"));
+        bindingGroup.addBinding(binding);
+
         jLabel2.setText("Ano de lançamento:");
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, uiTabela, org.jdesktop.beansbinding.ELProperty.create("${selectedElement.anoLancamento}"), uiAnoLancamento, org.jdesktop.beansbinding.BeanProperty.create("text"));
+        bindingGroup.addBinding(binding);
 
         jLabel3.setText("Produtora:");
 
-        uiProdutora.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        org.jdesktop.swingbinding.JComboBoxBinding jComboBoxBinding = org.jdesktop.swingbinding.SwingBindings.createJComboBoxBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, listProd, uiProdutora);
+        bindingGroup.addBinding(jComboBoxBinding);
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, uiTabela, org.jdesktop.beansbinding.ELProperty.create("${selectedElement.produtora}"), uiProdutora, org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
+        bindingGroup.addBinding(binding);
 
         jLabel4.setText("Série:");
 
-        uiSerie.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBoxBinding = org.jdesktop.swingbinding.SwingBindings.createJComboBoxBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, listSerie, uiSerie);
+        bindingGroup.addBinding(jComboBoxBinding);
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, uiTabela, org.jdesktop.beansbinding.ELProperty.create("${selectedElement.serie}"), uiSerie, org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
+        bindingGroup.addBinding(binding);
 
         javax.swing.GroupLayout uiEdicaoLayout = new javax.swing.GroupLayout(uiEdicao);
         uiEdicao.setLayout(uiEdicaoLayout);
@@ -237,21 +291,73 @@ public class TemporadaCRUD extends javax.swing.JFrame {
                 .addGap(0, 127, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Edição", uiEdicao);
+        uiPaineis.addTab("Edição", uiEdicao);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1)
+            .addComponent(uiPaineis, javax.swing.GroupLayout.DEFAULT_SIZE, 548, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
+            .addComponent(uiPaineis)
         );
+
+        bindingGroup.bind();
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void uiIncluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uiIncluirActionPerformed
+        editando = true;
+        selecionado = new Temporada();
+        list1.add(selecionado);
+        uiTabela.setRowSelectionInterval(list1.size() - 1, list1.size() - 1);
+        atualizaTela();
+    }//GEN-LAST:event_uiIncluirActionPerformed
+
+    private void uiAlterarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uiAlterarActionPerformed
+        editando = true;
+        selecionado = list1.get(uiTabela.getSelectedRow());
+        atualizaTela();
+    }//GEN-LAST:event_uiAlterarActionPerformed
+
+    private void uiExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uiExcluirActionPerformed
+        if (JOptionPane.showConfirmDialog(rootPane, "Confirma a exclusão?") == 0) {
+        selecionado = list1.get(uiTabela.getSelectedRow());
+        EntityManager em = JPAUtil.getEntityManager();
+        em.getTransaction().begin();
+        em.remove(em.merge(selecionado));
+        em.getTransaction().commit();
+        selecionado = null;
+        atualizaLista();
+        atualizaTela();
+ }
+
+    }//GEN-LAST:event_uiExcluirActionPerformed
+
+    private void uiSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uiSalvarActionPerformed
+        editando = false;
+        EntityManager em = JPAUtil.getEntityManager();
+        em.getTransaction().begin();
+        em.merge(selecionado);
+        em.getTransaction().commit();
+        selecionado = null;
+        atualizaLista();
+        atualizaTela();
+    }//GEN-LAST:event_uiSalvarActionPerformed
+
+    private void uiCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uiCancelarActionPerformed
+        editando = false;
+        selecionado = null;
+        atualizaLista();
+        atualizaTela();
+    }//GEN-LAST:event_uiCancelarActionPerformed
+
+    private void uiTabelaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_uiTabelaMouseClicked
+        atualizaTela();
+    }//GEN-LAST:event_uiTabelaMouseClicked
 
     /**
      * @param args the command line arguments
@@ -279,28 +385,38 @@ public class TemporadaCRUD extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(TemporadaCRUD.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        //</editor-fold>
 
-        /* Create and display the form */
+        /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new TemporadaCRUD().setVisible(true);
+                TemporadaCRUD dialog = new TemporadaCRUD(new javax.swing.JFrame(), true);
+                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
+                    public void windowClosing(java.awt.event.WindowEvent e) {
+                        System.exit(0);
+                    }
+                });
+                dialog.setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.persistence.EntityManager entityManager1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JTable jTable2;
+    private java.util.List<Temporada> list1;
+    private java.util.List<Produtora> listProd;
+    private java.util.List<Serie> listSerie;
+    private javax.persistence.Query query1;
+    private javax.persistence.Query queryProd;
+    private javax.persistence.Query querySerie;
     private javax.swing.JButton uiAlterar;
     private javax.swing.JTextField uiAnoLancamento;
     private javax.swing.JButton uiCancelar;
@@ -309,9 +425,11 @@ public class TemporadaCRUD extends javax.swing.JFrame {
     private javax.swing.JButton uiExcluir;
     private javax.swing.JButton uiIncluir;
     private javax.swing.JTextField uiNumero;
+    private javax.swing.JTabbedPane uiPaineis;
     private javax.swing.JComboBox<String> uiProdutora;
     private javax.swing.JButton uiSalvar;
     private javax.swing.JComboBox<String> uiSerie;
     private javax.swing.JTable uiTabela;
+    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 }

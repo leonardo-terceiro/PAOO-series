@@ -99,7 +99,7 @@ public class Produtora implements Serializable {
 
     @Override
     public String toString() {
-        return "br.upf.ads.series.dominio.Produtora[ id=" + id + " ]";
+        return nome;
     }
     
 }

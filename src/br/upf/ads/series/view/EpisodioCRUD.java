@@ -5,16 +5,41 @@
  */
 package br.upf.ads.series.view;
 
+import br.upf.ads.series.dominio.Episodio;
+import br.upf.ads.series.dominio.Temporada;
+import br.upf.ads.series.persistencia.JPAUtil;
+import javax.persistence.EntityManager;
+import javax.swing.JOptionPane;
+
 /**
  *
- * @author danrl
+ * @author leonardo.bertuzzi
  */
-public class EpisodioCRUD extends javax.swing.JFrame {
+public class EpisodioCRUD extends javax.swing.JDialog {
 
+    private Boolean editando;
+    private Episodio selecionado;
+   
+    private void atualizaLista(){
+        list1.clear();
+        list1.addAll(query1.getResultList());
+    }
+    
+    private void atualizaTela(){
+        uiIncluir.setEnabled(!editando);
+        uiAlterar.setEnabled(!editando && uiTabela.getSelectedRow() >= 0);
+        uiExcluir.setEnabled(!editando && uiTabela.getSelectedRow() >= 0);
+        uiSalvar.setEnabled(editando);
+        uiCancelar.setEnabled(editando);
+        uiPaineis.setSelectedComponent(editando ? uiEdicao : uiConsulta);
+    }
+
+    
     /**
-     * Creates new form EpisodioCRUD
+     * Creates new form EpisodioCRUD1
      */
-    public EpisodioCRUD() {
+    public EpisodioCRUD(java.awt.Frame parent, boolean modal) {
+        super(parent, modal);
         initComponents();
     }
 
@@ -26,7 +51,13 @@ public class EpisodioCRUD extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
+        entityManager1 = JPAUtil.getEntityManager();
+        query1 = java.beans.Beans.isDesignTime() ? null : entityManager1.createQuery("SELECT e FROM Episodio e");
+        list1 = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : org.jdesktop.observablecollections.ObservableCollections.observableList(query1.getResultList());
+        queryTemporada = java.beans.Beans.isDesignTime() ? null : entityManager1.createQuery("SELECT t FROM Temporada t");
+        listTemporada = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : org.jdesktop.observablecollections.ObservableCollections.observableList(queryTemporada.getResultList());
         uiPaineis = new javax.swing.JTabbedPane();
         uiConsulta = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
@@ -46,18 +77,33 @@ public class EpisodioCRUD extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         uiTemporada = new javax.swing.JComboBox<>();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jPanel4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         uiIncluir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/upf/ads/series/icones/cad_incluir.png"))); // NOI18N
         uiIncluir.setText("Incluir");
+        uiIncluir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                uiIncluirActionPerformed(evt);
+            }
+        });
 
         uiAlterar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/upf/ads/series/icones/cad_alterar.png"))); // NOI18N
         uiAlterar.setText("Alterar");
+        uiAlterar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                uiAlterarActionPerformed(evt);
+            }
+        });
 
         uiExcluir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/upf/ads/series/icones/cad_excluir.png"))); // NOI18N
         uiExcluir.setText("Excluir");
+        uiExcluir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                uiExcluirActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -70,7 +116,7 @@ public class EpisodioCRUD extends javax.swing.JFrame {
                 .addComponent(uiAlterar)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(uiExcluir)
-                .addContainerGap(144, Short.MAX_VALUE))
+                .addContainerGap(124, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -83,18 +129,32 @@ public class EpisodioCRUD extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        uiTabela.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+        org.jdesktop.swingbinding.JTableBinding jTableBinding = org.jdesktop.swingbinding.SwingBindings.createJTableBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, list1, uiTabela);
+        org.jdesktop.swingbinding.JTableBinding.ColumnBinding columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${id}"));
+        columnBinding.setColumnName("Id");
+        columnBinding.setColumnClass(Long.class);
+        columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${nome}"));
+        columnBinding.setColumnName("Nome");
+        columnBinding.setColumnClass(String.class);
+        columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${resumo}"));
+        columnBinding.setColumnName("Resumo");
+        columnBinding.setColumnClass(String.class);
+        columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${temporada}"));
+        columnBinding.setColumnName("Temporada");
+        columnBinding.setColumnClass(br.upf.ads.series.dominio.Temporada.class);
+        bindingGroup.addBinding(jTableBinding);
+        jTableBinding.bind();
+        uiTabela.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                uiTabelaMouseClicked(evt);
             }
-        ));
+        });
         jScrollPane1.setViewportView(uiTabela);
+        if (uiTabela.getColumnModel().getColumnCount() > 0) {
+            uiTabela.getColumnModel().getColumn(0).setMinWidth(50);
+            uiTabela.getColumnModel().getColumn(0).setPreferredWidth(50);
+            uiTabela.getColumnModel().getColumn(0).setMaxWidth(50);
+        }
 
         javax.swing.GroupLayout uiConsultaLayout = new javax.swing.GroupLayout(uiConsulta);
         uiConsulta.setLayout(uiConsultaLayout);
@@ -118,9 +178,19 @@ public class EpisodioCRUD extends javax.swing.JFrame {
 
         uiSalvar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/upf/ads/series/icones/cad_gravar.png"))); // NOI18N
         uiSalvar.setText("Salvar");
+        uiSalvar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                uiSalvarActionPerformed(evt);
+            }
+        });
 
         uiCancelar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/upf/ads/series/icones/botao_voltar.png"))); // NOI18N
         uiCancelar.setText("Cancelar");
+        uiCancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                uiCancelarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -145,11 +215,20 @@ public class EpisodioCRUD extends javax.swing.JFrame {
 
         jLabel1.setText("Nome do episódio:");
 
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, uiTabela, org.jdesktop.beansbinding.ELProperty.create("${selectedElement.nome}"), uiNomeEpisodio, org.jdesktop.beansbinding.BeanProperty.create("text"));
+        bindingGroup.addBinding(binding);
+
         jLabel2.setText("Resumo:");
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, uiTabela, org.jdesktop.beansbinding.ELProperty.create("${selectedElement.resumo}"), uiResumo, org.jdesktop.beansbinding.BeanProperty.create("text"));
+        bindingGroup.addBinding(binding);
 
         jLabel3.setText("Temporada:");
 
-        uiTemporada.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        org.jdesktop.swingbinding.JComboBoxBinding jComboBoxBinding = org.jdesktop.swingbinding.SwingBindings.createJComboBoxBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, listTemporada, uiTemporada);
+        bindingGroup.addBinding(jComboBoxBinding);
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, uiTabela, org.jdesktop.beansbinding.ELProperty.create("${selectedElement.temporada}"), uiTemporada, org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
+        bindingGroup.addBinding(binding);
 
         javax.swing.GroupLayout uiEdicaoLayout = new javax.swing.GroupLayout(uiEdicao);
         uiEdicao.setLayout(uiEdicaoLayout);
@@ -166,10 +245,9 @@ public class EpisodioCRUD extends javax.swing.JFrame {
                 .addGroup(uiEdicaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(uiResumo)
                     .addGroup(uiEdicaoLayout.createSequentialGroup()
-                        .addGroup(uiEdicaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(uiNomeEpisodio, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(uiTemporada, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 170, Short.MAX_VALUE)))
+                        .addComponent(uiNomeEpisodio, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 150, Short.MAX_VALUE))
+                    .addComponent(uiTemporada, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         uiEdicaoLayout.setVerticalGroup(
@@ -201,13 +279,62 @@ public class EpisodioCRUD extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(uiPaineis, javax.swing.GroupLayout.PREFERRED_SIZE, 271, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(uiPaineis, javax.swing.GroupLayout.PREFERRED_SIZE, 271, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
+
+        bindingGroup.bind();
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void uiIncluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uiIncluirActionPerformed
+        editando = true;
+        selecionado = new Episodio();
+        list1.add(selecionado);
+        uiTabela.setRowSelectionInterval(list1.size() - 1, list1.size() - 1);
+        atualizaTela();
+    }//GEN-LAST:event_uiIncluirActionPerformed
+
+    private void uiAlterarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uiAlterarActionPerformed
+        editando = true;
+        selecionado = list1.get(uiTabela.getSelectedRow());
+        atualizaTela();
+    }//GEN-LAST:event_uiAlterarActionPerformed
+
+    private void uiExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uiExcluirActionPerformed
+        if (JOptionPane.showConfirmDialog(rootPane, "Confirma a exclusão?") == 0) {
+            selecionado = list1.get(uiTabela.getSelectedRow());
+            EntityManager em = JPAUtil.getEntityManager();
+            em.getTransaction().begin();
+            em.remove(em.merge(selecionado));
+            em.getTransaction().commit();
+            selecionado = null;
+            atualizaLista();
+            atualizaTela();
+        }
+    }//GEN-LAST:event_uiExcluirActionPerformed
+
+    private void uiSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uiSalvarActionPerformed
+        editando = false;
+        EntityManager em = JPAUtil.getEntityManager();
+        em.getTransaction().begin();
+        em.merge(selecionado);
+        em.getTransaction().commit();
+        selecionado = null;
+        atualizaLista();
+        atualizaTela();
+    }//GEN-LAST:event_uiSalvarActionPerformed
+
+    private void uiCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uiCancelarActionPerformed
+        editando = false;
+        selecionado = null;
+        atualizaLista();
+        atualizaTela();
+    }//GEN-LAST:event_uiCancelarActionPerformed
+
+    private void uiTabelaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_uiTabelaMouseClicked
+        atualizaTela();
+    }//GEN-LAST:event_uiTabelaMouseClicked
 
     /**
      * @param args the command line arguments
@@ -235,22 +362,35 @@ public class EpisodioCRUD extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(EpisodioCRUD.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        //</editor-fold>
 
-        /* Create and display the form */
+        /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new EpisodioCRUD().setVisible(true);
+                EpisodioCRUD dialog = new EpisodioCRUD(new javax.swing.JFrame(), true);
+                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
+                    public void windowClosing(java.awt.event.WindowEvent e) {
+                        System.exit(0);
+                    }
+                });
+                dialog.setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.persistence.EntityManager entityManager1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
+    private java.util.List<Episodio> list1;
+    private java.util.List<Temporada> listTemporada;
+    private javax.persistence.Query query1;
+    private javax.persistence.Query queryTemporada;
     private javax.swing.JButton uiAlterar;
     private javax.swing.JButton uiCancelar;
     private javax.swing.JPanel uiConsulta;
@@ -263,5 +403,6 @@ public class EpisodioCRUD extends javax.swing.JFrame {
     private javax.swing.JButton uiSalvar;
     private javax.swing.JTable uiTabela;
     private javax.swing.JComboBox<String> uiTemporada;
+    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 }

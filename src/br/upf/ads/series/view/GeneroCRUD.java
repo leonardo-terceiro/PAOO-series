@@ -14,7 +14,7 @@ import javax.swing.JOptionPane;
  *
  * @author leonardo.bertuzzi
  */
-public class GeneroCRUD1 extends javax.swing.JDialog {
+public class GeneroCRUD extends javax.swing.JDialog {
 
     private Boolean editando;
     private Genero selecionado;
@@ -40,7 +40,7 @@ public class GeneroCRUD1 extends javax.swing.JDialog {
     /**
      * Creates new form NewJDialog
      */
-    public GeneroCRUD1(java.awt.Frame parent, boolean modal) {
+    public GeneroCRUD(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         editando = false;
@@ -298,21 +298,23 @@ public class GeneroCRUD1 extends javax.swing.JDialog {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(GeneroCRUD1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(GeneroCRUD.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(GeneroCRUD1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(GeneroCRUD.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(GeneroCRUD1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(GeneroCRUD.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(GeneroCRUD1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(GeneroCRUD.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
 
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                GeneroCRUD1 dialog = new GeneroCRUD1(new javax.swing.JFrame(), true);
+                GeneroCRUD dialog = new GeneroCRUD(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {

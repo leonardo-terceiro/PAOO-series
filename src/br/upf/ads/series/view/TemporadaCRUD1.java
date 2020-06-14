@@ -28,6 +28,9 @@ public class TemporadaCRUD1 extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        entityManager1 = java.beans.Beans.isDesignTime() ? null : javax.persistence.Persistence.createEntityManagerFactory("seriesPU").createEntityManager();
+        query1 = java.beans.Beans.isDesignTime() ? null : ((javax.persistence.EntityManager)null).createQuery("");
+        list1 = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : ((javax.persistence.Query)null).getResultList();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         uiConsulta = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
@@ -267,6 +270,7 @@ public class TemporadaCRUD1 extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.persistence.EntityManager entityManager1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -275,6 +279,8 @@ public class TemporadaCRUD1 extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private java.util.List list1;
+    private javax.persistence.Query query1;
     private javax.swing.JButton uiAlterar;
     private javax.swing.JTextField uiAnoLancamento;
     private javax.swing.JButton uiCancelar;

@@ -41,11 +41,9 @@ public class Temporada implements Serializable {
     private List<Episodio> episodios;
 
     @ManyToOne
-    @JoinColumn(name = "produtora_id")
     private Produtora produtora;
     
     @ManyToOne
-    @JoinColumn(name = "serie_id")
     private Serie serie;
 
     public Temporada(Long id, Integer numero, Integer anoLancamento, List<Episodio> episodios, Produtora produtora, Serie serie) {

@@ -29,7 +29,6 @@ public class Genero implements Serializable {
     @Column(name = "genero_id")
     private Long id;
 
-    //TODO adicionar os getters e setters e as outras baboseiras
     @Column(name = "nome")
     private String nome;
 
@@ -79,7 +78,7 @@ public class Genero implements Serializable {
 
     @Override
     public String toString() {
-        return "br.upf.ads.series.dominio.Genero[ id=" + id + " ]";
+        return nome;
     }
     
 }

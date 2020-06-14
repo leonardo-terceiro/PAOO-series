@@ -39,7 +39,7 @@ public class Serie implements Serializable {
     @OneToMany(mappedBy = "serie")
     private List<Temporada> temporadas;     
     
-    @ManyToOne
+    @ManyToOne(optional=false)
     private Genero generos;
 
     public Serie() {
@@ -115,7 +115,7 @@ public class Serie implements Serializable {
 
     @Override
     public String toString() {
-        return "br.upf.ads.series.dominio.Serie[ id=" + id + " ]";
+        return nome;
     }
     
 }
